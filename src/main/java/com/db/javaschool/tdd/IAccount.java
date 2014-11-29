@@ -10,4 +10,6 @@ public interface IAccount {
 
     public void setRevoked();
 
+    public boolean isRevoked();
+
 }

@@ -104,5 +104,12 @@ public class LoginServiceTest {
         verify(acc, never()).setRevoked();
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testLogin_shouldThrowException_whenAccountIsRevoked(){
+        doReturn(true).when(acc).isRevoked();
+        service.login("John", "peas");
+    }
+
+
 }
 

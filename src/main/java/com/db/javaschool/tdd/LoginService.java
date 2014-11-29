@@ -38,6 +38,10 @@ public class LoginService {
             throw new IllegalStateException("Account is not known");
         }
 
+        if (acc.isRevoked()) {
+            throw new IllegalStateException("Account is revoked");
+        }
+
         failedLoginAttempts.putIfAbsent(userName, new AtomicInteger(0));
         if (acc.passwordMatches(password)) {
             acc.setLoggedIn();
