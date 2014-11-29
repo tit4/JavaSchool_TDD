@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.7
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'TDD code snippets',
+                   'Implementation-Version': version
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {    
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+}
+
+idea {
+  project {
+    //if you want to set specific jdk and language level
+    jdkName = '1.7'
+    languageLevel = '1.7'
+
+    //you can configure the VCS used by the project
+    vcs = 'Git'
+  }
+}
