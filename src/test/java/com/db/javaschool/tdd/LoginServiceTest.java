@@ -20,8 +20,10 @@ public class LoginServiceTest {
     public void init() {
         acc = mock(IAccount.class);
         doReturn(true).when(acc).passwordMatches("pass");
+        doReturn("John").when(acc).getUserName();
         acc2 = mock(IAccount.class);
         doReturn(true).when(acc).passwordMatches("pass");
+        doReturn("Johan").when(acc2).getUserName();
         repo = mock(IAccountRepository.class);
         doReturn(acc).when(repo).find("John");
         doReturn(acc2).when(repo).find("Johan");
@@ -105,7 +107,7 @@ public class LoginServiceTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testLogin_shouldThrowException_whenAccountIsRevoked(){
+    public void testLogin_shouldThrowException_whenAccountIsRevoked() {
         doReturn(true).when(acc).isRevoked();
         service.login("John", "peas");
     }

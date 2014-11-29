@@ -1,8 +1,9 @@
 package com.db.javaschool.tdd;
 
 
+
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * There are several rules for logging in to our system:
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LoginService {
 
     private final IAccountRepository repo;
-    private ConcurrentHashMap<String, AtomicInteger> failedLoginAttempts = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, AtomicReference<ILoginState>> loginState = new ConcurrentHashMap<>();
 
     public LoginService(IAccountRepository repo) {
         this.repo = repo;
@@ -38,19 +39,12 @@ public class LoginService {
             throw new IllegalStateException("Account is not known");
         }
 
-        if (acc.isRevoked()) {
-            throw new IllegalStateException("Account is revoked");
-        }
-
-        failedLoginAttempts.putIfAbsent(userName, new AtomicInteger(0));
-        if (acc.passwordMatches(password)) {
-            acc.setLoggedIn();
-            failedLoginAttempts.get(userName).set(0);
-        } else {
-            int failedAttempts = failedLoginAttempts.get(userName).incrementAndGet();
-            if (failedAttempts == 3) {
-                acc.setRevoked();
-            }
+        loginState.putIfAbsent(userName, new AtomicReference<ILoginState>(new AwaitingLoginState()));
+        ILoginState currentState = loginState.get(userName).get();
+        ILoginState newState = currentState.login(acc, password);
+        while (!loginState.get(userName).compareAndSet(currentState, newState)) {
+            currentState = loginState.get(userName).get();
+            newState = currentState.login(acc, password);
         }
     }
 }
