@@ -1,17 +1,40 @@
 package com.db.javaschool.tdd.mockito;
 
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 //Let's import Mockito statically so that the code looks clearer
 
 public class MockitoExample {
+
+    @Mock
+    private List<String> mockedList;
+    @Spy
+    private ArrayList<String> listSpy;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void mockitoHelper() throws Exception {
+        // mockedList and listSpy should be populated during test setUp
+        assertNotNull(mockedList);
+        assertNotNull(listSpy);
+    }
 
     @Test
     public void verifySomeBehavior() {
@@ -30,7 +53,7 @@ public class MockitoExample {
 
     }
 
-    @Test
+    @Test (expected = RuntimeException.class)
     public void stubbing() {
         //You can mock concrete classes, not only interfaces
         List<String> mockedList = mock(LinkedList.class);
@@ -42,9 +65,6 @@ public class MockitoExample {
         //following prints "first"
         System.out.println(mockedList.get(0));
 
-        //following throws runtime exception
-        System.out.println(mockedList.get(1));
-
         //following prints "null" because get(999) was not stubbed
         System.out.println(mockedList.get(999));
 
@@ -52,6 +72,9 @@ public class MockitoExample {
         //If your code cares what get(0) returns then something else breaks (often before even verify() gets executed).
         //If your code doesn't care what get(0) returns then it should not be stubbed.
         verify(mockedList).get(0);
+
+        //following throws runtime exception
+        System.out.println(mockedList.get(1));
     }
 
     @Test
@@ -121,7 +144,7 @@ public class MockitoExample {
 
         //verification using atLeast()/atMost()
         verify(mockedList, atLeastOnce()).add("three times");
-        verify(mockedList, atLeast(10)).add("five times");
+        verify(mockedList, atLeast(5)).add("five times");
         verify(mockedList, atMost(5)).add("three times");
     }
 
@@ -177,7 +200,7 @@ public class MockitoExample {
         List<String> mockTwo = mock(List.class);
         List<String> mockThree = mock(List.class);
 
-        mockThree.add("three");
+        // mockThree.add("three");
         //using mocks - only mockOne is interacted
         mockOne.add("one");
 
